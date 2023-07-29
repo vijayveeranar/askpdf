@@ -11,7 +11,7 @@ import streamlit as st
 from streamlit_chat import message
 from utils import *
 
-st.subheader("Chatbot with Langchain, ChatGPT, Pinecone, and Streamlit")
+st.subheader("Ask My Book")
 
 if 'responses' not in st.session_state:
     st.session_state['responses'] = ["How can I assist you?"]

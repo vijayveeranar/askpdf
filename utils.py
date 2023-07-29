@@ -3,6 +3,7 @@ from langchain.vectorstores import Pinecone
 import streamlit as st
 import openai
 from sentence_transformers import SentenceTransformer
+from langchain.embeddings import SentenceTransformerEmbeddings
 model = SentenceTransformer('all-MiniLM-L6-v2')
 pinecone.init(
             api_key=st.secrets["PINECONE_API_KEY"],  # find at app.pinecone.io
@@ -13,12 +14,14 @@ index_name = "bookdb" # put in the name of your pinecone index here
 index = pinecone.Index(index_name)
 index_stats_response = index.describe_index_stats()
 print(index_stats_response)
+embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+docsearch = Pinecone.from_existing_index(index_name, embeddings)
 
 def get_similiar_docs(query,k=3,score=False):
   if score:
     similar_docs = index.similarity_search_with_score(query,k=k)
   else:
-    similar_docs = index.similarity_search(query,k=k)
+    similar_docs = docsearch.max_marginal_relevance_search(query,k=k, fetch_k=10)
   return similar_docs
 
 def get_conversation_string():
